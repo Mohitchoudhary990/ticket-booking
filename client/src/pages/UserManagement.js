@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllUsers } from "../services/adminService";
+import { getAllUsers, updateUserRole } from "../services/adminService";
 import "../styles/Admin.css";
 
 function UserManagement() {
@@ -8,7 +8,9 @@ function UserManagement() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [confirmDialog, setConfirmDialog] = useState({ show: false, user: null, newRole: false });
 
     useEffect(() => {
         fetchUsers();
@@ -23,9 +25,54 @@ function UserManagement() {
             setError("Failed to load users");
             setLoading(false);
             if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate("/admin/login");
+                navigate("/login");
             }
         }
+    };
+
+    const handleRoleToggle = (user) => {
+        const currentUserId = sessionStorage.getItem("userId");
+        const newAdminStatus = !user.isAdmin;
+
+        // Prevent self-demotion
+        if (user._id === currentUserId && !newAdminStatus) {
+            setError("❌ You cannot remove your own admin privileges");
+            setTimeout(() => setError(""), 3000);
+            return;
+        }
+
+        setConfirmDialog({
+            show: true,
+            user: user,
+            newRole: newAdminStatus
+        });
+    };
+
+    const confirmRoleChange = async () => {
+        const { user, newRole } = confirmDialog;
+        setConfirmDialog({ show: false, user: null, newRole: false });
+        setError("");
+        setSuccess("");
+
+        try {
+            const response = await updateUserRole(user._id, newRole);
+            setSuccess(`✅ ${response.message}`);
+
+            // Update local state
+            setUsers(users.map(u =>
+                u._id === user._id ? { ...u, isAdmin: newRole } : u
+            ));
+
+            setTimeout(() => setSuccess(""), 3000);
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || "Failed to update user role";
+            setError(`❌ ${errorMsg}`);
+            setTimeout(() => setError(""), 3000);
+        }
+    };
+
+    const cancelRoleChange = () => {
+        setConfirmDialog({ show: false, user: null, newRole: false });
     };
 
     const filteredUsers = users.filter(user => {
@@ -50,6 +97,7 @@ function UserManagement() {
             </div>
 
             {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
 
             <div className="admin-search-bar">
                 <input
@@ -71,8 +119,9 @@ function UserManagement() {
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Role</th>
                                 <th>Registered On</th>
-                                <th>Last Updated</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,14 +129,48 @@ function UserManagement() {
                                 <tr key={user._id}>
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
+                                    <td>
+                                        <span className={`role-badge ${user.isAdmin ? 'admin' : 'user'}`}>
+                                            {user.isAdmin ? '👑 Admin' : '👤 User'}
+                                        </span>
+                                    </td>
                                     <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                                    <td>{new Date(user.updatedAt).toLocaleDateString()}</td>
+                                    <td>
+                                        <button
+                                            onClick={() => handleRoleToggle(user)}
+                                            className={`role-toggle-btn ${user.isAdmin ? 'demote' : 'promote'}`}
+                                        >
+                                            {user.isAdmin ? '↓ Demote to User' : '↑ Promote to Admin'}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 )}
             </div>
+
+            {/* Confirmation Dialog */}
+            {confirmDialog.show && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>⚠️ Confirm Role Change</h3>
+                        <p>
+                            Are you sure you want to {confirmDialog.newRole ? 'promote' : 'demote'}{' '}
+                            <strong>{confirmDialog.user?.name}</strong> to{' '}
+                            {confirmDialog.newRole ? 'Admin' : 'User'}?
+                        </p>
+                        <div className="modal-actions">
+                            <button onClick={confirmRoleChange} className="confirm-btn">
+                                Yes, Change Role
+                            </button>
+                            <button onClick={cancelRoleChange} className="cancel-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

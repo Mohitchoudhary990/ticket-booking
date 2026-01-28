@@ -59,6 +59,11 @@ export const getAllUsers = async () => {
     return response.data;
 };
 
+export const updateUserRole = async (id, isAdmin) => {
+    const response = await axiosInstance.patch(`/users/${id}/role`, { isAdmin });
+    return response.data;
+};
+
 export default {
     getDashboardStats,
     createEvent,
@@ -66,5 +71,6 @@ export default {
     deleteEvent,
     getAllBookings,
     cancelBooking,
-    getAllUsers
+    getAllUsers,
+    updateUserRole
 };

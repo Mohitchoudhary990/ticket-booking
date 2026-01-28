@@ -48,7 +48,7 @@ const createAdminUser = async () => {
         console.log("Email:", adminData.email);
         console.log("Password:", adminData.password);
         console.log("\n⚠️  Please change the password after first login!");
-        console.log("\nYou can now login at: http://localhost:3000/admin/login");
+        console.log("\nYou can now login at: http://localhost:3000/login");
 
         process.exit(0);
     } catch (error) {

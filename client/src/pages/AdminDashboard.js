@@ -28,14 +28,15 @@ function AdminDashboard() {
             setError("Failed to load dashboard stats");
             setLoading(false);
             if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate("/admin/login");
+                navigate("/login");
             }
         }
     };
 
     const handleLogout = () => {
-        sessionStorage.removeItem("adminToken");
-        navigate("/admin/login");
+        sessionStorage.clear();
+        window.dispatchEvent(new Event("loginStateChange"));
+        navigate("/login");
     };
 
     if (loading) {

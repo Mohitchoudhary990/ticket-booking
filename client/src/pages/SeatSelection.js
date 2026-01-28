@@ -53,7 +53,7 @@ const SeatSelection = () => {
             });
 
             if (res.data.success) {
-                alert(`✅ Booking successful!\nSeats: ${selectedSeats.join(', ')}\nBooking ID: ${res.data.booking._id}`);
+                alert(`✅ Booking successful!\\nSeats: ${selectedSeats.join(', ')}\\nBooking ID: ${res.data.booking._id}`);
                 navigate("/bookings");
             }
         } catch (error) {
@@ -189,3 +189,4 @@ const SeatSelection = () => {
 };
 
 export default SeatSelection;
+

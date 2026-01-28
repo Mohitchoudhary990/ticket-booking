@@ -5,7 +5,6 @@ import Register from "./pages/Register";
 import Events from "./pages/Events";
 import SeatSelection from "./pages/SeatSelection";
 import MyBookings from "./pages/MyBookings";
-import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import EventManagement from "./pages/EventManagement";
 import BookingManagement from "./pages/BookingManagement";
@@ -93,11 +92,10 @@ function AppContent() {
           <Route path="/bookings" element={isLoggedIn ? <MyBookings /> : <Navigate to="/login" />} />
 
           {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/events" element={<EventManagement />} />
-          <Route path="/admin/bookings" element={<BookingManagement />} />
-          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/dashboard" element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/login" />} />
+          <Route path="/admin/events" element={isLoggedIn ? <EventManagement /> : <Navigate to="/login" />} />
+          <Route path="/admin/bookings" element={isLoggedIn ? <BookingManagement /> : <Navigate to="/login" />} />
+          <Route path="/admin/users" element={isLoggedIn ? <UserManagement /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </div>

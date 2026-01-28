@@ -5,10 +5,12 @@ import "../styles/Auth.css";
 
 const Login = () => {
   const navigate = useNavigate();
+
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
   });
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -18,14 +20,17 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setMessage("");
     setError("");
 
     try {
       const res = await API.post("/auth/login", form);
+
+      // Save token
       sessionStorage.setItem("token", res.data.token);
 
-      // Store user info including role
+      // Save user info
       if (res.data.user) {
         sessionStorage.setItem("userRole", res.data.user.role || "user");
         sessionStorage.setItem("userName", res.data.user.name);
@@ -34,20 +39,25 @@ const Login = () => {
       setMessage("✅ Login successful!");
       setForm({ email: "", password: "" });
 
-      // Dispatch custom event to notify App component
+      // Notify app
       window.dispatchEvent(new Event("loginStateChange"));
 
-      // Redirect based on user role
+      // Redirect after delay
       setTimeout(() => {
         const userRole = res.data.user?.role || "user";
+
         if (userRole === "admin") {
+          sessionStorage.setItem("adminToken", res.data.token);
           navigate("/admin/dashboard");
         } else {
           navigate("/events");
         }
       }, 800);
+
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Login failed";
+      const errorMsg =
+        err.response?.data?.message || "Login failed";
+
       setError("❌ " + errorMsg);
     }
   };
@@ -62,6 +72,7 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Email</label>
+
           <input
             name="email"
             type="email"
@@ -74,6 +85,7 @@ const Login = () => {
 
         <div className="form-group">
           <label>Password</label>
+
           <input
             name="password"
             type="password"
@@ -84,11 +96,25 @@ const Login = () => {
           />
         </div>
 
-        <button type="submit" className="submit-btn">Login</button>
+        <button type="submit" className="submit-btn">
+          Login
+        </button>
       </form>
 
-      <p style={{ textAlign: "center", marginTop: "20px", color: "#666" }}>
-        Don't have an account? <a href="/register" style={{ color: "#667eea", fontWeight: "600" }}>Register here</a>
+      <p
+        style={{
+          textAlign: "center",
+          marginTop: "20px",
+          color: "#666",
+        }}
+      >
+        Don't have an account?{" "}
+        <a
+          href="/register"
+          style={{ color: "#667eea", fontWeight: "600" }}
+        >
+          Register here
+        </a>
       </p>
     </div>
   );

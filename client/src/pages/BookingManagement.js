@@ -23,7 +23,7 @@ function BookingManagement() {
             setError("Failed to load bookings");
             setLoading(false);
             if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate("/admin/login");
+                navigate("/login");
             }
         }
     };

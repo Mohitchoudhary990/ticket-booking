@@ -20,5 +20,6 @@ router.delete("/bookings/:id", adminController.cancelBooking);
 
 // User management
 router.get("/users", adminController.getAllUsers);
+router.patch("/users/:id/role", adminController.updateUserRole);
 
 module.exports = router;

@@ -156,12 +156,54 @@ exports.cancelBooking = async (req, res) => {
 // Get all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({ isAdmin: false })
+        const users = await User.find()
             .select("-password")
             .sort({ createdAt: -1 });
 
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: "Error fetching users", error: error.message });
+    }
+};
+
+// Update user role (admin/user)
+exports.updateUserRole = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isAdmin } = req.body;
+
+        // Validate input
+        if (typeof isAdmin !== "boolean") {
+            return res.status(400).json({ message: "isAdmin must be a boolean value" });
+        }
+
+        // Find user
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Prevent self-demotion (optional safety check)
+        if (req.user.id === id && !isAdmin) {
+            return res.status(400).json({
+                message: "You cannot remove your own admin privileges"
+            });
+        }
+
+        // Update role
+        user.isAdmin = isAdmin;
+        await user.save();
+
+        res.json({
+            message: `User ${isAdmin ? 'promoted to admin' : 'demoted to user'} successfully`,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.isAdmin
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating user role", error: error.message });
     }
 };
