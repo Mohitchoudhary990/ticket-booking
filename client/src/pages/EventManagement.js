@@ -25,7 +25,8 @@ function EventManagement() {
 
     const fetchEvents = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/events");
+            const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+            const response = await axios.get(`${API_URL}/events`);
             setEvents(response.data);
             setLoading(false);
         } catch (err) {

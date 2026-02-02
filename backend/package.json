@@ -1,14 +1,20 @@
 {
   "name": "ticket-booking-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step required'"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Ticket Booking System Backend API",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
