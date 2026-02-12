@@ -7,7 +7,7 @@ exports.createEvent = async (req, res) => {
 
     // 1️⃣ Validate input
     if (!title || !description || !date || !price || !totalSeats) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ message:"All fields are required" });
     }
 
     // 2️⃣ Create event
