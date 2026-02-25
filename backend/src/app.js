@@ -15,6 +15,7 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost:5173',
       'https://ticket-booking-pearl.vercel.app',
+      'https://ticket-booking-fvdf.vercel.app',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
